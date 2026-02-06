@@ -1,7 +1,23 @@
-# Use official Python slim image
+# Stage 1: Build React frontend
+FROM node:20-alpine AS frontend
+
+WORKDIR /frontend
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy source
+COPY . .
+
+# Build the React app
+RUN npm run build
+
+# Stage 2: Python backend with frontend
 FROM python:3.11-slim
 
-# Set workdir
 WORKDIR /app
 
 # Install system deps for librosa (librosa needs libsndfile)
@@ -15,8 +31,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app
+# Copy app code
 COPY . /app
+
+# Copy built frontend from builder stage
+COPY --from=frontend /frontend/dist ./dist
 
 # Expose port
 ENV PORT=8080

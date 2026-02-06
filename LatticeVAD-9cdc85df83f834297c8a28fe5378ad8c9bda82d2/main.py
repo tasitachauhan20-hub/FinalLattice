@@ -6,6 +6,7 @@ import numpy as np
 import librosa
 from fastapi import FastAPI, Header, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, validator
 from typing import Optional
 from enum import Enum
@@ -141,3 +142,10 @@ async def voice_detection(
             status_code=400,
             content={"status": "error", "message": f"Processing failed: {str(e)}"}
         )
+
+
+# --- Mount Frontend Static Files ---
+# Serve the built React app if available (production deployment)
+dist_path = os.path.join(os.path.dirname(__file__), 'dist')
+if os.path.isdir(dist_path):
+    app.mount('/', StaticFiles(directory=dist_path, html=True), name='static')

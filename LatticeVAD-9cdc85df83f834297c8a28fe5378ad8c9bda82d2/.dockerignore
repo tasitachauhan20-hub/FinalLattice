@@ -8,4 +8,8 @@ __pycache__/
 .vscode
 node_modules/
 *.egg-info
-*** End Patch
+.github/
+.DS_Store
+README.md
+dist-ssr/
+*.local
